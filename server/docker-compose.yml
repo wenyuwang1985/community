@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgis/postgis:16-3.4
+    build: ./sql/init_database
     environment:
       POSTGRES_DB: community
       POSTGRES_USER: dev
@@ -11,6 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./sql/init_database:/docker-entrypoint-initdb.d
 
   redis:
     image: redis:7-alpine

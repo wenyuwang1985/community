@@ -1,0 +1,18 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  host: localhost
+  port: 5432
+  user: dev
+  password: dev123
+  dbname: community
+  sslmode: disable
+
+redis:
+  addr: localhost:6379
+  db: 0
+
+snowflake:
+  node_id: 1
