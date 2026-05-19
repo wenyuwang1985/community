@@ -9,6 +9,7 @@ type Config struct {
 	Database  DatabaseConfig
 	Redis     RedisConfig
 	Snowflake SnowflakeConfig
+	JWT       JWTConfig
 }
 
 type ServerConfig struct {
@@ -32,6 +33,12 @@ type RedisConfig struct {
 
 type SnowflakeConfig struct {
 	NodeID int64 `mapstructure:"node_id"`
+}
+
+type JWTConfig struct {
+	Secret        string
+	AccessExpire  int `mapstructure:"access_expire"`
+	RefreshExpire int `mapstructure:"refresh_expire"`
 }
 
 func Load(path string) (*Config, error) {

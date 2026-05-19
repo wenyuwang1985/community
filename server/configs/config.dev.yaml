@@ -16,3 +16,8 @@ redis:
 
 snowflake:
   node_id: 1
+
+jwt:
+  secret: "community-dev-secret-key-change-in-prod"
+  access_expire: 7200
+  refresh_expire: 604800

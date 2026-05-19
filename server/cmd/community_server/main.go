@@ -12,7 +12,9 @@ import (
 
 	"github.com/wenyuwang1985/community/internal/config"
 	"github.com/wenyuwang1985/community/internal/database"
+	"github.com/wenyuwang1985/community/internal/handler"
 	"github.com/wenyuwang1985/community/internal/router"
+	"github.com/wenyuwang1985/community/internal/service"
 	"github.com/wenyuwang1985/community/pkg/snowflake"
 )
 
@@ -45,8 +47,18 @@ func main() {
 	defer rdb.Close()
 	log.Println("Redis 连接成功")
 
+	// 初始化 service 和 handler
+	authService := service.NewAuthService(pgPool)
+	authHandler := handler.NewAuthHandler(authService, cfg.JWT)
+
+	userService := service.NewUserService(pgPool)
+	userHandler := handler.NewUserHandler(userService)
+
+	communityService := service.NewCommunityService(pgPool)
+	communityHandler := handler.NewCommunityHandler(communityService)
+
 	// 注册路由
-	r := router.Setup(cfg.Server.Mode)
+	r := router.Setup(cfg.Server.Mode, authHandler, userHandler, communityHandler, cfg.JWT.Secret)
 
 	// 启动 HTTP 服务
 	srv := &http.Server{

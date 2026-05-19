@@ -48,3 +48,4 @@
 - 错误处理使用统一响应格式
 - SQL 文件按编号命名：`001_xxx.sql`、`002_xxx.sql`
 - 本地开发环境通过根目录 `docker-compose.yml` 启动
+- 服务端编译产物在 `server/bin` 目录
