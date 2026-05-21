@@ -9,7 +9,7 @@ import (
 func Setup(mode string, authHandler *handler.AuthHandler, userHandler *handler.UserHandler, communityHandler *handler.CommunityHandler, postHandler *handler.PostHandler, marketHandler *handler.MarketHandler, chatHandler *handler.ChatHandler, wsHandler *handler.WSHandler, jwtSecret string) *gin.Engine {
 	gin.SetMode(mode)
 	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(middleware.CORS(), gin.Logger(), gin.Recovery())
 
 	v1 := r.Group("/api/v1")
 	{
