@@ -1,4 +1,4 @@
-import { api } from '../api.js'
+import { api, uploadFiles } from '../api.js'
 
 const categories = [
   { key: '', label: '全部' },
@@ -103,6 +103,8 @@ export default {
       showCommunitySwitch: false,
       showItemModal: false,
       itemForm: { title: '', price: 0, condition: 'like_new', category: 'other', images: '' },
+      selectedFiles: [],
+      previewImages: [],
       itemLoading: false,
     }
   },

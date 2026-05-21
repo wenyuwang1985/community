@@ -27,6 +27,35 @@ function request(method, path, body) {
   })
 }
 
+export function uploadFiles(files) {
+  const token = uni.getStorageSync('token') || ''
+  return new Promise((resolve, reject) => {
+    const urls = []
+    let completed = 0
+    for (const file of files) {
+      uni.uploadFile({
+        url: BASE + '/upload',
+        filePath: file,
+        name: 'files',
+        header: { 'Authorization': 'Bearer ' + token },
+        success: (res) => {
+          try {
+            const data = JSON.parse(res.data)
+            if (data.code === 0 && data.data?.urls?.length) {
+              urls.push(...data.data.urls)
+            }
+          } catch (e) {}
+        },
+        fail: reject,
+        complete: () => {
+          completed++
+          if (completed >= files.length) resolve(urls)
+        }
+      })
+    }
+  })
+}
+
 export const api = {
   login: (phone, password) => request('POST', '/auth/login', { phone, password }),
   register: (phone, password) => request('POST', '/auth/register', { phone, password }),

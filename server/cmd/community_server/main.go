@@ -71,8 +71,11 @@ func main() {
 	wsHub := ws.NewHub()
 	wsHandler := handler.NewWSHandler(wsHub, chatService, cfg.JWT.Secret)
 
+	uploadService := service.NewUploadService("")
+	uploadHandler := handler.NewUploadHandler(uploadService)
+
 	// 注册路由
-	r := router.Setup(cfg.Server.Mode, authHandler, userHandler, communityHandler, postHandler, marketHandler, chatHandler, wsHandler, cfg.JWT.Secret)
+	r := router.Setup(cfg.Server.Mode, authHandler, userHandler, communityHandler, postHandler, marketHandler, chatHandler, wsHandler, uploadHandler, cfg.JWT.Secret)
 
 	// 启动 HTTP 服务
 	srv := &http.Server{

@@ -34,8 +34,11 @@
         <picker mode="selector" :range="categoryLabels" :value="categoryIndex" @change="onCategoryChange">
           <view style="padding:8px 0;border-bottom:1px solid #eee;margin-bottom:8px;">分类：{{ categoryLabels[categoryIndex] }}</view>
         </picker>
-        <input v-model="itemForm.images" placeholder="图片URL，逗号分隔" style="padding:8px 0;border-bottom:1px solid #eee;margin-bottom:8px;" />
-        <button class="btn-primary" @click="submitItem">发布</button>
+        <button style="padding:8px 0;color:#576b95;font-size:14px;" @click="chooseImages">选择图片（最多9张）</button>
+        <view v-if="previewImages.length" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;">
+          <image v-for="(img, idx) in previewImages" :key="idx" :src="img" style="width:60px;height:60px;border-radius:4px;" mode="aspectFill" />
+        </view>
+        <button class="btn-primary" @click="submitItem" :disabled="itemLoading">{{ itemLoading ? '发布中...' : '发布' }}</button>
       </view>
     </view>
 
@@ -82,6 +85,8 @@ export default {
       items: [], loading: false, hasMore: true, lastId: 0,
       showPicker: false, showItem: false,
       itemForm: { title: '', price: 0, condition: 'like_new', category: 'other', images: '' },
+      selectedFiles: [],
+      previewImages: [],
       conditionIndex: 1, categoryIndex: 5,
       conditionLabels: conditions.map(c => c.label),
       categoryLabels: categories.filter(c => c.key).map(c => c.label)
@@ -116,15 +121,31 @@ export default {
     loadMore() { this.loadItems() },
     onConditionChange(e) { this.conditionIndex = e.detail.value; this.itemForm.condition = conditions[this.conditionIndex].key },
     onCategoryChange(e) { this.categoryIndex = e.detail.value; this.itemForm.category = categories.filter(c=>c.key)[this.categoryIndex].key },
+    chooseImages() {
+      uni.chooseImage({
+        count: 9,
+        sizeType: ['compressed'],
+        success: (res) => {
+          this.selectedFiles = res.tempFilePaths
+          this.previewImages = res.tempFilePaths
+        }
+      })
+    },
     async submitItem() {
       if (!this.itemForm.title || this.itemForm.price <= 0) { uni.showToast({ title: '请填写标题和价格', icon: 'none' }); return }
+      this.itemLoading = true
       try {
-        const images = this.itemForm.images.split(',').map(s => s.trim()).filter(Boolean)
+        let images = []
+        if (this.selectedFiles.length > 0) {
+          images = await uploadFiles(this.selectedFiles)
+        }
         await api.createItem({ ...this.itemForm, community_id: this.currentCommunity.id, images })
         this.showItem = false
         this.itemForm = { title: '', price: 0, condition: 'like_new', category: 'other', images: '' }
+        this.selectedFiles = []; this.previewImages = []
         this.resetAndLoad()
       } catch (e) { uni.showToast({ title: e.message, icon: 'none' }) }
+      finally { this.itemLoading = false }
     },
     conditionText(c) {
       const map = { new: '全新', like_new: '几乎全新', lightly_used: '轻微使用', heavily_used: '明显使用' }

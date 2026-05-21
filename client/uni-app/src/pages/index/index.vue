@@ -26,8 +26,11 @@
           </view>
         </picker>
         <textarea v-model="postContent" placeholder="说点什么..." style="width:100%;height:100px;border:1px solid #eee;padding:8px;" />
-        <input v-model="postImages" placeholder="图片URL，逗号分隔" style="width:100%;padding:8px 0;border-bottom:1px solid #eee;margin-top:8px;" />
-        <button class="btn-primary" style="margin-top:16px;" @click="submitPost">发布</button>
+        <button style="padding:8px 0;color:#576b95;font-size:14px;" @click="chooseImages">选择图片（最多9张）</button>
+        <view v-if="previewImages.length" style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">
+          <image v-for="(img, idx) in previewImages" :key="idx" :src="img" style="width:60px;height:60px;border-radius:4px;" mode="aspectFill" />
+        </view>
+        <button class="btn-primary" style="margin-top:16px;" @click="submitPost" :disabled="postLoading">{{ postLoading ? '发布中...' : '发布' }}</button>
       </view>
     </view>
 
@@ -99,7 +102,8 @@ export default {
       tagIndex: 0,
       tagOptions: tagLabels,
       postContent: '',
-      postImages: ''
+      selectedFiles: [],
+      previewImages: []
     }
   },
   onShow() {
@@ -133,17 +137,33 @@ export default {
     },
     loadMore() { this.loadPosts() },
     onTagChange(e) { this.tagIndex = e.detail.value },
+    chooseImages() {
+      uni.chooseImage({
+        count: 9,
+        sizeType: ['compressed'],
+        success: (res) => {
+          this.selectedFiles = res.tempFilePaths
+          this.previewImages = res.tempFilePaths
+        }
+      })
+    },
     async submitPost() {
       if (!this.postContent.trim()) return
+      this.postLoading = true
       try {
-        const images = this.postImages.split(',').map(s => s.trim()).filter(Boolean)
+        let images = []
+        if (this.selectedFiles.length > 0) {
+          images = await uploadFiles(this.selectedFiles)
+        }
         await api.createPost(this.currentCommunity.id, tagKeys[this.tagIndex], this.postContent, images)
         this.showPost = false
-        this.postContent = ''; this.postImages = ''; this.tagIndex = 0
+        this.postContent = ''; this.selectedFiles = []; this.previewImages = []; this.tagIndex = 0
         this.posts = []; this.lastId = 0; this.hasMore = true
         this.loadPosts()
       } catch (e) {
         uni.showToast({ title: e.message, icon: 'none' })
+      } finally {
+        this.postLoading = false
       }
     },
     async toggleLike(post) {

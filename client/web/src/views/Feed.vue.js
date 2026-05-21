@@ -1,4 +1,4 @@
-import { api } from '../api.js'
+import { api, uploadFiles } from '../api.js'
 
 export default {
   template: `
@@ -102,7 +102,8 @@ export default {
       showPostModal: false,
       postTag: 'share',
       postContent: '',
-      postImages: '',
+      selectedFiles: [],
+      previewImages: [],
       postLoading: false,
     }
   },
@@ -144,14 +145,24 @@ export default {
     loadMore() {
       this.loadPosts()
     },
+    onFileChange(e) {
+      const files = Array.from(e.target.files || [])
+      if (files.length > 9) { alert('最多选择9张图片'); return }
+      this.selectedFiles = files
+      this.previewImages = files.map(f => URL.createObjectURL(f))
+    },
     async submitPost() {
       if (!this.postContent.trim()) return
       this.postLoading = true
       try {
-        const images = this.postImages.split(',').map(s => s.trim()).filter(Boolean)
+        let images = []
+        if (this.selectedFiles.length > 0) {
+          images = await uploadFiles(this.selectedFiles)
+        }
         await api.createPost(this.currentCommunity.id, this.postTag, this.postContent, images)
         this.showPostModal = false
-        this.postContent = ''; this.postImages = ''; this.postTag = 'share'
+        this.postContent = ''; this.selectedFiles = []; this.previewImages = []; this.postTag = 'share'
+        if (this.$refs.fileInput) this.$refs.fileInput.value = ''
         this.posts = []; this.lastId = 0; this.hasMore = true
         this.loadPosts()
       } catch (e) {

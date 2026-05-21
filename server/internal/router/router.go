@@ -6,10 +6,13 @@ import (
 	"github.com/wenyuwang1985/community/internal/middleware"
 )
 
-func Setup(mode string, authHandler *handler.AuthHandler, userHandler *handler.UserHandler, communityHandler *handler.CommunityHandler, postHandler *handler.PostHandler, marketHandler *handler.MarketHandler, chatHandler *handler.ChatHandler, wsHandler *handler.WSHandler, jwtSecret string) *gin.Engine {
+func Setup(mode string, authHandler *handler.AuthHandler, userHandler *handler.UserHandler, communityHandler *handler.CommunityHandler, postHandler *handler.PostHandler, marketHandler *handler.MarketHandler, chatHandler *handler.ChatHandler, wsHandler *handler.WSHandler, uploadHandler *handler.UploadHandler, jwtSecret string) *gin.Engine {
 	gin.SetMode(mode)
 	r := gin.New()
 	r.Use(middleware.CORS(), gin.Logger(), gin.Recovery())
+
+	// 静态文件服务（上传的图片）
+	r.Static("/uploads", "assets/uploads")
 
 	v1 := r.Group("/api/v1")
 	{
@@ -64,6 +67,9 @@ func Setup(mode string, authHandler *handler.AuthHandler, userHandler *handler.U
 		authorized.PUT("/items/:id", marketHandler.UpdateItem)
 		authorized.PUT("/items/:id/sold", marketHandler.MarkSold)
 		authorized.PUT("/items/:id/off", marketHandler.MarkOff)
+
+		// 文件上传
+		authorized.POST("/upload", uploadHandler.Upload)
 
 		// 聊天
 		authorized.GET("/conversations", chatHandler.ListConversations)
