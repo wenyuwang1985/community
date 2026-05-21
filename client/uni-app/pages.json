@@ -20,10 +20,10 @@
     "backgroundColor": "#fff",
     "borderStyle": "black",
     "list": [
-      { "pagePath": "src/pages/index/index", "text": "广场", "iconPath": "static/tab-feed.png", "selectedIconPath": "static/tab-feed-active.png" },
-      { "pagePath": "src/pages/market/index", "text": "集市", "iconPath": "static/tab-market.png", "selectedIconPath": "static/tab-market-active.png" },
-      { "pagePath": "src/pages/chat/index", "text": "聊天", "iconPath": "static/tab-chat.png", "selectedIconPath": "static/tab-chat-active.png" },
-      { "pagePath": "src/pages/profile/index", "text": "我的", "iconPath": "static/tab-profile.png", "selectedIconPath": "static/tab-profile-active.png" }
+      { "pagePath": "src/pages/index/index", "text": "广场" },
+      { "pagePath": "src/pages/market/index", "text": "集市" },
+      { "pagePath": "src/pages/chat/index", "text": "聊天" },
+      { "pagePath": "src/pages/profile/index", "text": "我的" }
     ]
   }
 }
