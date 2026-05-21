@@ -21,7 +21,11 @@ import (
 
 func main() {
 	// 加载配置
-	cfg, err := config.Load("configs/config.dev.yaml")
+	configPath := "configs/config.dev.yaml"
+	if len(os.Args) > 2 && os.Args[1] == "-config" {
+		configPath = os.Args[2]
+	}
+	cfg, err := config.Load(configPath)
 	if err != nil {
 		log.Fatalf("加载配置失败: %v", err)
 	}

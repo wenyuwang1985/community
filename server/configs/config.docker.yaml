@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  mode: release
+
+database:
+  host: postgres
+  port: 5432
+  user: dev
+  password: dev123
+  dbname: community
+  sslmode: disable
+
+redis:
+  addr: redis:6379
+  db: 0
+
+snowflake:
+  node_id: 1
+
+jwt:
+  secret: "community-docker-secret-key-change-in-prod"
+  access_expire: 7200
+  refresh_expire: 604800
