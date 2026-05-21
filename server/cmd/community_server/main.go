@@ -15,6 +15,7 @@ import (
 	"github.com/wenyuwang1985/community/internal/handler"
 	"github.com/wenyuwang1985/community/internal/router"
 	"github.com/wenyuwang1985/community/internal/service"
+	"github.com/wenyuwang1985/community/internal/ws"
 	"github.com/wenyuwang1985/community/pkg/snowflake"
 )
 
@@ -54,11 +55,24 @@ func main() {
 	userService := service.NewUserService(pgPool)
 	userHandler := handler.NewUserHandler(userService)
 
+	chatService := service.NewChatService(pgPool)
+
 	communityService := service.NewCommunityService(pgPool)
-	communityHandler := handler.NewCommunityHandler(communityService)
+	communityHandler := handler.NewCommunityHandler(communityService, chatService)
+
+	postService := service.NewPostService(pgPool)
+	postHandler := handler.NewPostHandler(postService)
+
+	marketService := service.NewMarketService(pgPool)
+	marketHandler := handler.NewMarketHandler(marketService)
+
+	chatHandler := handler.NewChatHandler(chatService)
+
+	wsHub := ws.NewHub()
+	wsHandler := handler.NewWSHandler(wsHub, chatService, cfg.JWT.Secret)
 
 	// 注册路由
-	r := router.Setup(cfg.Server.Mode, authHandler, userHandler, communityHandler, cfg.JWT.Secret)
+	r := router.Setup(cfg.Server.Mode, authHandler, userHandler, communityHandler, postHandler, marketHandler, chatHandler, wsHandler, cfg.JWT.Secret)
 
 	// 启动 HTTP 服务
 	srv := &http.Server{

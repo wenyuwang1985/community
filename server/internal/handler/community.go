@@ -11,10 +11,11 @@ import (
 
 type CommunityHandler struct {
 	communityService *service.CommunityService
+	chatService      *service.ChatService
 }
 
-func NewCommunityHandler(communityService *service.CommunityService) *CommunityHandler {
-	return &CommunityHandler{communityService: communityService}
+func NewCommunityHandler(communityService *service.CommunityService, chatService *service.ChatService) *CommunityHandler {
+	return &CommunityHandler{communityService: communityService, chatService: chatService}
 }
 
 func (h *CommunityHandler) Search(c *gin.Context) {
@@ -42,9 +43,15 @@ func (h *CommunityHandler) Subscribe(c *gin.Context) {
 		return
 	}
 
-	if err := h.communityService.Subscribe(c.Request.Context(), userID, communityID); err != nil {
+	ctx := c.Request.Context()
+	if err := h.communityService.Subscribe(ctx, userID, communityID); err != nil {
 		middleware.Error(c, http.StatusBadRequest, 400, err.Error())
 		return
+	}
+
+	// 自动加入社区频道
+	if h.chatService != nil {
+		_ = h.chatService.JoinChannelConversation(ctx, userID, communityID)
 	}
 
 	middleware.Success(c, nil)
@@ -59,7 +66,13 @@ func (h *CommunityHandler) Unsubscribe(c *gin.Context) {
 		return
 	}
 
-	if err := h.communityService.Unsubscribe(c.Request.Context(), userID, communityID); err != nil {
+	ctx := c.Request.Context()
+	// 先离开社区频道
+	if h.chatService != nil {
+		_ = h.chatService.LeaveChannelConversation(ctx, userID, communityID)
+	}
+
+	if err := h.communityService.Unsubscribe(ctx, userID, communityID); err != nil {
 		middleware.Error(c, http.StatusBadRequest, 400, err.Error())
 		return
 	}
