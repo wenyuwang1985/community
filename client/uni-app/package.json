@@ -1,0 +1,20 @@
+{
+  "name": "community-uni-app",
+  "version": "1.0.0",
+  "scripts": {
+    "dev:h5": "uni",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:h5": "uni build",
+    "build:mp-weixin": "uni build -p mp-weixin"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-alpha-4010520240409001",
+    "@dcloudio/uni-h5": "3.0.0-alpha-4010520240409001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-4010520240409001",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-4010520240409001",
+    "vite": "^5.0.0"
+  }
+}
