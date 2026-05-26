@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { api } from '../../utils/api.js'
+import { api, uploadFiles } from '../../utils/api.js'
 
 const tagMap = { help: '求助', share: '分享', notice: '通知', qa: '问答' }
 const tagKeys = ['share', 'help', 'notice', 'qa']

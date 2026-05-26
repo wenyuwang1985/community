@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { api } from '../../utils/api.js'
+import { api, uploadFiles } from '../../utils/api.js'
 
 const categories = [
   { key: '', label: '全部' }, { key: 'appliance', label: '家电' },
